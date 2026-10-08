@@ -1,0 +1,76 @@
+{% load static %}<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kirish — Maktab CRM</title>
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+<div class="login-bg">
+  <div class="login-card">
+    <div class="login-logo">🎓</div>
+    <h1>Maktab CRM</h1>
+    <p class="login-sub">Elektron jurnal va boshqaruv tizimi</p>
+
+    {% if role_error %}
+    <div class="login-error">{{ role_error }}</div>
+    {% elif pending_error %}
+    <div class="login-info">🕓 So'rovingiz hali admin tomonidan tasdiqlanmagan. Tasdiqlangach kira olasiz.</div>
+    {% elif form.errors %}
+    <div class="login-error">Login yoki parol noto'g'ri! Qayta urinib ko'ring.</div>
+    {% endif %}
+
+    {% if request.GET.logged_out %}
+    <div class="login-info">Tizimdan muvaffaqiyatli chiqdingiz.</div>
+    {% endif %}
+
+    <form method="post" class="login-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <input type="hidden" name="role" id="roleInput" value="{{ selected_role|default:'teacher' }}">
+
+      <div class="role-label">Kim sifatida kirmoqchisiz?</div>
+      <div class="role-picker" id="rolePicker">
+        <button type="button" class="role-opt" data-role="admin"><span class="ro-ico">🛠️</span>Administrator</button>
+        <button type="button" class="role-opt" data-role="teacher"><span class="ro-ico">👨‍🏫</span>O'qituvchi</button>
+        <button type="button" class="role-opt" data-role="student"><span class="ro-ico">🎓</span>O'quvchi</button>
+        <button type="button" class="role-opt" data-role="parent"><span class="ro-ico">👪</span>Ota-ona</button>
+      </div>
+
+      <div class="field">
+        <label>Foydalanuvchi nomi</label>
+        <input type="text" name="username" autofocus required value="{{ form.username.value|default:'' }}" placeholder="username">
+      </div>
+      <div class="field">
+        <label>Parol</label>
+        <input type="password" name="password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="login-btn">Kirish</button>
+    </form>
+
+    <div class="login-foot">Hisobingiz yo'qmi? <a href="/register/" class="reg-link">Ro'yxatdan o'tish</a><br>
+      Maktab CRM · O'quvchi, o'qituvchi va ota-ona uchun yagona tizim</div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var picker = document.getElementById("rolePicker");
+    var input = document.getElementById("roleInput");
+    function sync() {
+      picker.querySelectorAll(".role-opt").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.role === input.value);
+      });
+    }
+    picker.addEventListener("click", function (e) {
+      var b = e.target.closest(".role-opt");
+      if (!b) return;
+      input.value = b.dataset.role;
+      sync();
+    });
+    sync();
+  })();
+</script>
+</body>
+</html>

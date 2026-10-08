@@ -1,0 +1,157 @@
+{% load static %}<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<title>Ro'yxatdan o'tish — Maktab CRM</title>
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+<body>
+<div class="login-bg">
+  <div class="login-card login-card-wide">
+    <div class="login-logo">🎓</div>
+    <h1>Ro'yxatdan o'tish</h1>
+    <p class="login-sub">So'rov yuboring — admin tasdiqlagach tizimga kirasiz</p>
+
+    <div class="login-info" id="regInfo" style="display:none">
+      ✅ So'rovingiz yuborildi! Admin tasdiqlagach, loginingiz bilan kira olasiz.
+      <div style="margin-top:10px"><a href="/login/" class="reg-link">Kirish sahifasiga o'tish</a></div>
+    </div>
+
+    <div class="login-error" id="regError" style="display:none"></div>
+
+    <form class="login-form" id="regForm">
+      {% csrf_token %}
+      <div class="role-label">Kim sifatida ro'yxatdan o'tmoqchisiz?</div>
+      <div class="role-picker" id="rolePicker">
+        <button type="button" class="role-opt active" data-role="teacher"><span class="ro-ico">👨‍🏫</span>O'qituvchi</button>
+        <button type="button" class="role-opt" data-role="student"><span class="ro-ico">🎓</span>O'quvchi</button>
+        <button type="button" class="role-opt" data-role="parent"><span class="ro-ico">👪</span>Ota-ona</button>
+      </div>
+      <input type="hidden" name="role" id="regRole" value="teacher">
+
+      <div class="field">
+        <label>F.I.Sh. (to'liq ism)</label>
+        <input type="text" id="regName" required placeholder="Abdullayev Jasur">
+      </div>
+      <div class="field">
+        <label>Login (foydalanuvchi nomi)</label>
+        <input type="text" id="regUsername" required placeholder="jasur2026">
+      </div>
+      <div class="field" id="classField" style="display:none">
+        <label>Sinf</label>
+        <select id="regClass" class="reg-select">
+          <option value="">— sinf tanlang —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Telefon raqam</label>
+        <input type="text" id="regPhone" placeholder="+998 90 123 45 67">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Parol</label>
+          <input type="password" id="regPass" required placeholder="••••••••">
+        </div>
+        <div class="field">
+          <label>Parolni tasdiqlang</label>
+          <input type="password" id="regPass2" required placeholder="••••••••">
+        </div>
+      </div>
+      <div class="field">
+        <label>Izoh (ixtiyoriy)</label>
+        <textarea id="regMessage" class="reg-select" rows="2" placeholder="Masalan: 5-A sinf o'quvchisiman"></textarea>
+      </div>
+
+      <button type="submit" class="login-btn" id="regSubmit">So'rov yuborish</button>
+    </form>
+
+    <div class="login-foot">Hisobingiz bormi? <a href="/login/" class="reg-link">Kirish</a></div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var csrf = document.querySelector('meta[name="csrf-token"]').content;
+    var roleInput = document.getElementById("regRole");
+    var picker = document.getElementById("rolePicker");
+    var classField = document.getElementById("classField");
+    var classSelect = document.getElementById("regClass");
+    var form = document.getElementById("regForm");
+    var errorBox = document.getElementById("regError");
+    var infoBox = document.getElementById("regInfo");
+
+    function syncRole() {
+      picker.querySelectorAll(".role-opt").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.role === roleInput.value);
+      });
+      classField.style.display = roleInput.value === "student" ? "block" : "none";
+    }
+    picker.addEventListener("click", function (e) {
+      var b = e.target.closest(".role-opt");
+      if (!b) return;
+      roleInput.value = b.dataset.role;
+      syncRole();
+    });
+    syncRole();
+
+    fetch("/api/register/meta/").then(function (r) { return r.json(); }).then(function (d) {
+      (d.classes || []).forEach(function (c) {
+        var o = document.createElement("option");
+        o.value = c.id; o.textContent = c.name;
+        classSelect.appendChild(o);
+      });
+    }).catch(function () {});
+
+    function showError(msg) { errorBox.textContent = msg; errorBox.style.display = "block"; }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      errorBox.style.display = "none";
+      var pass = document.getElementById("regPass").value;
+      if (pass !== document.getElementById("regPass2").value) {
+        showError("Parollar bir xil emas."); return;
+      }
+      var payload = {
+        role: roleInput.value,
+        full_name: document.getElementById("regName").value.trim(),
+        username: document.getElementById("regUsername").value.trim(),
+        password: pass,
+        phone: document.getElementById("regPhone").value.trim(),
+        message: document.getElementById("regMessage").value.trim(),
+      };
+      if (roleInput.value === "student") {
+        var c = classSelect.value;
+        if (!c) { showError("O'quvchi uchun sinf tanlang."); return; }
+        payload.school_class = Number(c);
+      }
+      var btn = document.getElementById("regSubmit");
+      btn.disabled = true; btn.textContent = "Yuborilmoqda...";
+      fetch("/api/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+        body: JSON.stringify(payload),
+      }).then(function (r) {
+        return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+      }).then(function (res) {
+        if (!res.ok) {
+          var msg = res.data && res.data.detail ? res.data.detail : null;
+          if (!msg && res.data) {
+            msg = Object.keys(res.data).map(function (k) {
+              return k + ": " + [].concat(res.data[k]).join(", ");
+            }).join("; ");
+          }
+          throw new Error(msg || "Xatolik yuz berdi");
+        }
+        form.style.display = "none";
+        infoBox.style.display = "block";
+      }).catch(function (err) {
+        showError(err.message);
+        btn.disabled = false; btn.textContent = "So'rov yuborish";
+      });
+    });
+  })();
+</script>
+</body>
+</html>

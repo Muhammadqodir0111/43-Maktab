@@ -1,0 +1,204 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #10132b 0%, #1e2340 55%, #2b2350 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-bg {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .35);
+  padding: 38px 34px 28px;
+  text-align: center;
+  animation: rise .4s ease;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #4f46e5, #a855f7);
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  box-shadow: 0 10px 24px rgba(79, 70, 229, .4);
+}
+
+.login-card h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1f2430;
+  letter-spacing: -.3px;
+}
+
+.login-sub {
+  color: #6b7280;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin: 6px 0 24px;
+}
+
+.login-error {
+  background: #fdeaea;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #f5c6c6;
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+}
+
+.login-info {
+  background: #e7f7ee;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #bfe8cd;
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+}
+
+.login-card-wide { max-width: 460px; }
+
+.login-form { text-align: left; }
+
+.reg-link {
+  color: #4f46e5;
+  font-weight: 800;
+  text-decoration: none;
+}
+.reg-link:hover { text-decoration: underline; }
+
+.reg-select {
+  width: 100%;
+  border: 1.5px solid #e5e9f2;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 14px;
+  outline: none;
+  background: #fff;
+  font-family: inherit;
+  color: #1f2430;
+}
+.reg-select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, .13); }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.role-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.role-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e5e9f2;
+  background: #fff;
+  color: #4b5563;
+  border-radius: 12px;
+  padding: 11px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .13s;
+  text-align: left;
+}
+
+.role-opt .ro-ico { font-size: 16px; }
+
+.role-opt:hover { border-color: #c7ccdb; }
+
+.role-opt.active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+}
+
+.field { margin-bottom: 14px; }
+
+.field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.field input {
+  width: 100%;
+  border: 1.5px solid #e5e9f2;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14.5px;
+  outline: none;
+  background: #fff;
+  transition: border .15s, box-shadow .15s;
+  font-family: inherit;
+}
+
+.field input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .13);
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 6px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, .3);
+  transition: filter .15s, transform .1s;
+  font-family: inherit;
+}
+
+.login-btn:hover { filter: brightness(1.07); }
+.login-btn:active { transform: scale(.985); }
+
+.login-foot {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid #eef0f5;
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 600;
+}

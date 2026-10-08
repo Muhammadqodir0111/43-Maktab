@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>Maktab CRM — Elektron jurnal</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">🎓</div>
+      <div>
+        <div class="brand-name">Maktab CRM</div>
+        <div class="brand-sub">Elektron jurnal</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <a href="#" class="nav-item" data-page="dashboard" data-roles="admin,teacher">
+        <span class="nav-icon">📊</span> Boshqaruv</a>
+      <a href="#" class="nav-item" data-page="journal" data-roles="admin,teacher">
+        <span class="nav-icon">📓</span> Jurnal</a>
+      <a href="#" class="nav-item" data-page="lesson" data-roles="admin,teacher">
+        <span class="nav-icon">🧑‍🏫</span> Dars o'tkazish</a>
+      <a href="#" class="nav-item" data-page="attendance" data-roles="admin,teacher">
+        <span class="nav-icon">✅</span> Davomat</a>
+      <a href="#" class="nav-item" data-page="homework" data-roles="admin,teacher">
+        <span class="nav-icon">📝</span> Uyga vazifa</a>
+      <a href="#" class="nav-item" data-page="schedule" data-roles="admin,teacher,student">
+        <span class="nav-icon">🗓</span> Dars jadvali</a>
+      <a href="#" class="nav-item" data-page="classes" data-roles="admin">
+        <span class="nav-icon">🏫</span> Sinflar</a>
+      <a href="#" class="nav-item" data-page="students" data-roles="admin">
+        <span class="nav-icon">🎓</span> O'quvchilar</a>
+      <a href="#" class="nav-item" data-page="teachers" data-roles="admin">
+        <span class="nav-icon">👨‍🏫</span> O'qituvchilar</a>
+      <a href="#" class="nav-item" data-page="subjects" data-roles="admin">
+        <span class="nav-icon">📚</span> Fanlar</a>
+      <a href="#" class="nav-item" data-page="parents" data-roles="admin">
+        <span class="nav-icon">👪</span> Ota-onalar</a>
+      <a href="#" class="nav-item" data-page="registrations" data-roles="admin">
+        <span class="nav-icon">📥</span> So'rovlar <span class="nav-badge" id="regBadge" style="display:none"></span></a>
+      <a href="#" class="nav-item" data-page="announcements" data-roles="admin,teacher,student,parent">
+        <span class="nav-icon">📢</span> E'lonlar</a>
+      <a href="#" class="nav-item" data-page="mypanel" data-roles="student,parent">
+        <span class="nav-icon">🧑‍🎓</span> Shaxsiy panel</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="user-box">
+        <span class="user-avatar">👤</span>
+        <div class="user-info">
+          <div id="userName" class="user-name"></div>
+          <div id="userRole" class="user-role"></div>
+        </div>
+        <button class="theme-btn" id="themeBtn" title="Kun / tun rejimi">🌙</button>
+        <form method="post" action="/logout/" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="logout-link" title="Tizimdan chiqish">⏻</button>
+        </form>
+      </div>
+      <div id="todayDate" class="today"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="pageTitle">Boshqaruv paneli</h1>
+      <div class="topbar-right" id="topbarRight"></div>
+    </header>
+
+    <!-- Boshqaruv -->
+    <section class="page" id="page-dashboard">
+      <div class="stats" id="dashStats"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><h3 id="dashWeekTitle">Haftalik davomat</h3></div>
+          <div id="dashWeek"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 id="dashClassesTitle">Sinflar</h3></div>
+          <div id="dashClasses"></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><h3 id="dashGradesTitle">So'nggi baholar</h3></div>
+          <div id="dashGrades"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 id="dashNewsTitle">E'lonlar</h3></div>
+          <div id="dashNews"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Jurnal -->
+    <section class="page" id="page-journal">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf</label><select id="jrnClass"></select></div>
+        <div class="date-ctrl"><label>Fan</label><select id="jrnSubject"></select></div>
+        <div class="date-ctrl"><label>Oy</label><input type="month" id="jrnMonth"></div>
+        <button class="btn btn-primary" id="jrnLoad">Ko'rsatish</button>
+        <button class="btn" id="jrnQuarter">🎯 Chorak baholari</button>
+      </div>
+      <div id="journalView"></div>
+    </section>
+
+    <!-- Dars o'tkazish -->
+    <section class="page" id="page-lesson">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf</label><select id="lesClass"></select></div>
+        <div class="date-ctrl"><label>Sana</label><input type="date" id="lesDate"></div>
+        <button class="btn btn-primary" id="lesLoad">Ko'rsatish</button>
+      </div>
+      <div id="lessonView"></div>
+    </section>
+
+    <!-- Davomat -->
+    <section class="page" id="page-attendance">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf</label><select id="attClass"></select></div>
+        <div class="date-ctrl"><label>Sana</label><input type="date" id="attDate"></div>
+        <button class="btn btn-primary" id="attLoad">Ko'rsatish</button>
+        <button class="btn" id="attAllPresent">Hammasi keldi</button>
+      </div>
+      <div id="attendanceView"></div>
+    </section>
+
+    <!-- Uyga vazifa -->
+    <section class="page" id="page-homework">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf</label><select id="hwClass"></select></div>
+        <div class="date-ctrl"><label>Fan</label><select id="hwSubject"></select></div>
+        <button class="btn btn-primary" id="hwLoad">Ko'rsatish</button>
+        <button class="btn btn-primary" id="hwAdd">➕ Vazifa qo'shish</button>
+      </div>
+      <div id="homeworkView"></div>
+    </section>
+
+    <!-- Dars jadvali -->
+    <section class="page" id="page-schedule">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf</label><select id="schClass"></select></div>
+        <button class="btn btn-primary" id="schLoad">Ko'rsatish</button>
+        <button class="btn btn-primary admin-teacher" id="schAdd">➕ Dars qo'shish</button>
+      </div>
+      <div id="scheduleView"></div>
+    </section>
+
+    <!-- Sinflar -->
+    <section class="page" id="page-classes">
+      <div class="toolbar">
+        <button class="btn btn-primary" id="classAdd">➕ Sinf qo'shish</button>
+      </div>
+      <div class="card" id="classesView"></div>
+    </section>
+
+    <!-- O'quvchilar -->
+    <section class="page" id="page-students">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Sinf bo'yicha</label><select id="stdClassFilter"></select></div>
+        <button class="btn btn-primary" id="studentAdd">➕ O'quvchi qo'shish</button>
+      </div>
+      <div class="card" id="studentsView"></div>
+    </section>
+
+    <!-- O'qituvchilar -->
+    <section class="page" id="page-teachers">
+      <div class="toolbar">
+        <button class="btn btn-primary" id="teacherAdd">➕ O'qituvchi qo'shish</button>
+      </div>
+      <div class="card" id="teachersView"></div>
+    </section>
+
+    <!-- Fanlar -->
+    <section class="page" id="page-subjects">
+      <div class="toolbar">
+        <button class="btn btn-primary" id="subjectAdd">➕ Fan qo'shish</button>
+      </div>
+      <div class="card" id="subjectsView"></div>
+    </section>
+
+    <!-- Ota-onalar -->
+    <section class="page" id="page-parents">
+      <div class="toolbar">
+        <button class="btn btn-primary" id="parentAdd">➕ Ota-ona qo'shish</button>
+      </div>
+      <div class="card" id="parentsView"></div>
+    </section>
+
+    <!-- Ro'yxatdan o'tish so'rovlari -->
+    <section class="page" id="page-registrations">
+      <div class="toolbar">
+        <div class="date-ctrl"><label>Holat</label>
+          <select id="regStatus">
+            <option value="pending">Kutilmoqda</option>
+            <option value="approved">Tasdiqlangan</option>
+            <option value="rejected">Rad etilgan</option>
+            <option value="">Barchasi</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="regLoad">Ko'rsatish</button>
+      </div>
+      <div id="registrationsView"></div>
+    </section>
+
+    <!-- E'lonlar -->
+    <section class="page" id="page-announcements">
+      <div class="toolbar">
+        <button class="btn btn-primary admin-teacher" id="annAdd">➕ E'lon qo'shish</button>
+      </div>
+      <div id="announcementsView"></div>
+    </section>
+
+    <!-- Shaxsiy panel -->
+    <section class="page" id="page-mypanel">
+      <div class="toolbar" id="myPanelToolbar"></div>
+      <div id="myPanelView"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Umumiy forma modali -->
+<div class="modal-bg" id="formModal">
+  <div class="modal" id="formModalBox">
+    <div class="modal-head">
+      <h3 id="formModalTitle"></h3>
+      <button class="modal-close" data-close="formModal">✕</button>
+    </div>
+    <form id="formModalForm">
+      <div class="modal-body" id="formModalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close="formModal">Bekor qilish</button>
+        <button type="submit" class="btn btn-primary" id="formModalSubmit">Saqlash</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Ma'lumot modali -->
+<div class="modal-bg" id="infoModal">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <h3 id="infoModalTitle"></h3>
+      <button class="modal-close" data-close="infoModal">✕</button>
+    </div>
+    <div class="modal-body" id="infoModalBody"></div>
+  </div>
+</div>
+
+<!-- Tasdiqlash modali -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal modal-sm">
+    <div class="modal-head">
+      <h3>Tasdiqlash</h3>
+      <button class="modal-close" data-close="confirmModal">✕</button>
+    </div>
+    <div class="modal-body"><p id="confirmText"></p></div>
+    <div class="modal-actions">
+      <button type="button" class="btn" data-close="confirmModal">Bekor qilish</button>
+      <button type="button" class="btn btn-danger" id="confirmOk">O'chirish</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
